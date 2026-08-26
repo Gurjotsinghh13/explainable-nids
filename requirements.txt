@@ -1,0 +1,31 @@
+# Core data / ML stack (Python 3.10+)
+numpy>=1.24
+pandas>=2.0
+scikit-learn==1.8.0
+xgboost>=2.0
+imbalanced-learn>=0.11        # SMOTE, and Pipeline for within-fold resampling
+
+# Explainability
+shap>=0.44
+
+# Visualisation
+matplotlib>=3.7
+plotly>=5.18
+
+# Backend / deployment
+fastapi>=0.110
+uvicorn[standard]>=0.27       # ASGI server to run the FastAPI app
+pydantic>=2.5
+
+# Dashboard
+streamlit>=1.31
+requests>=2.31                # dashboard -> FastAPI calls
+
+# Utilities
+joblib>=1.3                   # saving/loading model artifacts
+
+# Notebook environment
+jupyter>=1.0
+notebook>=7.0
+
+# Note: SQLite needs no package — it ships with the Python standard library.
