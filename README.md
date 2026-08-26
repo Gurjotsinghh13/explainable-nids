@@ -1,75 +1,100 @@
 # Explainable AI-Based Network Intrusion Detection System (NIDS)
 
-B.Tech Computer Engineering Capstone Project.
+An end-to-end, explainable intrusion detection system that classifies network
+traffic into 11 categories on the **CICIDS2017** benchmark, explains every
+prediction, and serves it all through a live analyst dashboard.
 
-An explainable, ensemble-based, deployable NIDS evaluated end-to-end on the
-**CICIDS2017** benchmark. The system combines a stacking ensemble with
-leakage-free class-imbalance handling, per-prediction explanations, and a
-real-time analyst dashboard.
+Built as a B.Tech Computer Engineering capstone — from raw data to a deployed,
+explainable service.
 
-## Locked architecture
+![Analyst Dashboard](reports/figures/dashboard.png)
 
-| Component            | Choice                                                        |
-| -------------------- | ------------------------------------------------------------- |
-| Base learners        | Random Forest + XGBoost                                       |
-| Meta-learner         | Logistic Regression                                           |
-| Ensemble strategy    | Stacking (out-of-fold predictions -> meta-learner)            |
-| Class imbalance      | SMOTE (k=5) applied **within** each CV fold (not globally)    |
-| Explainability       | SHAP TreeExplainer (global summary + per-alert waterfall)     |
-| Classification       | Multi-class (all CICIDS2017 attack categories)                |
-| Backend              | FastAPI (REST inference + SHAP endpoints)                     |
-| Storage              | SQLite (alert log + inference history)                        |
-| Dashboard            | Streamlit (live feed, attack distribution, SHAP, latency)     |
-| Dataset              | CICIDS2017 — MachineLearningCVE 8-CSV version                 |
+## Highlights
 
-## Research gaps this project addresses
+- **Stacking ensemble** — Random Forest + XGBoost base learners with a Logistic
+  Regression meta-learner.
+- **Leakage-free class-imbalance handling** — SMOTE applied *strictly within each
+  cross-validation fold*, not globally, to avoid contaminating the meta-learner.
+- **Per-prediction explainability** — SHAP TreeExplainer surfaces the exact flow
+  features behind every alert.
+- **Deployed, not just trained** — FastAPI inference API, SQLite alert logging,
+  and a real-time Streamlit dashboard.
 
-1. No stacking + SHAP integration on CICIDS2017 in the reviewed literature.
-2. No end-to-end deployable stacking NIDS (stacking + SHAP + FastAPI + dashboard).
-3. SMOTE applied within stacking CV folds (leakage-free) — the core novelty.
-4. Multi-class evaluation (most high-accuracy CICIDS2017 papers are binary-only).
-5. SHAP overhead measured separately from inference latency.
-6. Reproducibility — CICIDS2017 used exclusively.
+## Results (held-out test set, 11 classes)
 
-## Folder layout
+| Model | Accuracy | Macro-F1 | Bot recall |
+|-------|:--------:|:--------:|:----------:|
+| Random Forest (baseline) | 0.998 | 0.956 | 0.499 |
+| XGBoost (baseline) | 0.999 | 0.969 | 0.752 |
+| **Stacking + within-fold SMOTE** | **0.999** | **0.976** | **0.844** |
+
+The within-fold SMOTE strategy lifts minority-class detection (Bot recall
+0.50 → 0.84) while holding majority-class performance, and does so without the
+data leakage that global SMOTE introduces. Per-alert SHAP explanation adds only
+~9 ms on top of ~37 ms inference.
+
+## Architecture
 
 ```
-nids-capstone/
-├── data/            CICIDS2017 CSVs live here (NOT committed — see data/README.md)
-├── notebooks/       Interactive development, step by step
-│   └── 01_data_inventory.ipynb   <- START HERE (ready to run)
-├── src/             Reusable modules (built together, one step at a time)
-├── api/             FastAPI inference backend (built later)
-├── dashboard/       Streamlit analyst dashboard (built later)
-├── db/              SQLite database + notes
-├── models/          Saved model artifacts (gitignored)
-└── reports/         Figures, evaluation outputs, report assets
+Raw CICIDS2017 flow
+      │
+      ▼
+Preprocessing  (clean → drop leakage features → scale)
+      │
+      ▼
+Stacking ensemble          SHAP TreeExplainer
+  RF + XGBoost  ──────────► (per-alert feature attribution)
+  → LogisticRegression
+      │
+      ▼
+FastAPI backend  ──►  SQLite alert log
+      │
+      ▼
+Streamlit analyst dashboard  (live feed · attack distribution · SHAP · latency)
 ```
 
-## How to use this skeleton
+## Tech stack
 
-This is an **empty scaffold**. Every module under `src/`, `api/`, and
-`dashboard/` is a placeholder stub with a docstring describing what goes there.
-We fill them in one at a time, and you run + confirm each step before moving on.
+Python · scikit-learn · XGBoost · imbalanced-learn · SHAP · FastAPI · SQLite · Streamlit · Plotly
 
-### Setup (one time)
+## Project structure
 
-```bash
-# From inside the nids-capstone folder
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# then:
-pip install -r requirements.txt
+```
+notebooks/   step-by-step development (inventory → preprocessing → models → SHAP)
+src/         reusable modules (preprocessing, models, evaluation, explainability)
+api/         FastAPI inference backend
+dashboard/   Streamlit analyst dashboard
 ```
 
-### Next step
+## Running it
 
-Open `notebooks/01_data_inventory.ipynb` and run it. Paste the outputs back
-into our chat so we can proceed to preprocessing.
+The dataset and trained model are **not** committed (large / licensed). To
+reproduce:
 
-## Evaluation metrics (planned)
+1. **Install**
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate        # Windows  (source .venv/bin/activate on Linux/Mac)
+   pip install -r requirements.txt
+   ```
+2. **Get the data** — download CICIDS2017 (MachineLearningCVE, 8 CSVs) and set
+   the path in `src/config.py`.
+3. **Train** — run the notebooks in order (`01` → `05`). This produces the saved
+   model and preprocessing artifacts.
+4. **Serve**
+   ```bash
+   python -m uvicorn api.main:app           # terminal 1 — API at :8000
+   python -m streamlit run dashboard/app.py # terminal 2 — dashboard at :8501
+   ```
 
-Accuracy, Precision, Recall, F1, ROC-AUC, False Positive Rate, **per-class F1**
-for every attack category, **inference latency**, and **SHAP overhead**
-(measured separately from inference).
+## Dataset
+
+CICIDS2017 (Canadian Institute for Cybersecurity), MachineLearningCVE version —
+~2.83M flows, 78 features. The two smallest classes (Heartbleed, Infiltration;
+11 and 36 samples) were excluded as too sparse for reliable training and
+evaluation, giving a clean 11-class problem.
+
+## Note
+
+Developed as an academic capstone project. This is a research/demonstration
+system, not a production-hardened security appliance.
