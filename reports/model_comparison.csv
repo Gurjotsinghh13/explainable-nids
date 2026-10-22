@@ -1,0 +1,4 @@
+model,accuracy,macro_F1,weighted_F1,Bot_recall
+RandomForest (baseline),0.9979,0.9563,0.9979,0.4987
+XGBoost (baseline),0.9987,0.969,0.9987,0.7519
+Stacking + within-fold SMOTE,0.999,0.9755,0.999,0.844
