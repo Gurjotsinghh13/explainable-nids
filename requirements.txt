@@ -1,7 +1,7 @@
 # Core data / ML stack (Python 3.10+)
 numpy>=1.24
 pandas>=2.0
-scikit-learn==1.8.0
+scikit-learn==1.8.0             # pinned: must match the version that trained the model
 xgboost>=2.0
 imbalanced-learn>=0.11        # SMOTE, and Pipeline for within-fold resampling
 
@@ -29,3 +29,4 @@ jupyter>=1.0
 notebook>=7.0
 
 # Note: SQLite needs no package — it ships with the Python standard library.
+pytest>=8.0

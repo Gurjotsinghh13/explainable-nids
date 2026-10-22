@@ -1,21 +1,35 @@
-"""Load and combine the 8 CICIDS2017 (MachineLearningCVE) CSV files.
-
-Built together in the data-inventory / preprocessing step. Stubs below define
-the intended interface; they are not implemented yet.
-"""
+"""Load and combine the 8 CICIDS2017 (MachineLearningCVE) CSV files."""
 
 from __future__ import annotations
 
+import glob
+import os
+from pathlib import Path
+
 import pandas as pd
 
+from .config import DATA_DIR
 
-def load_all_csvs(data_dir=None) -> pd.DataFrame:
-    """Read all 8 CSVs, strip whitespace from column names, and concatenate.
 
-    Args:
-        data_dir: Directory holding the CSVs. Defaults to config.DATA_DIR.
+def load_all_csvs(data_dir: str | Path | None = None, verbose: bool = True) -> pd.DataFrame:
+    """Read every CSV in ``data_dir``, strip column-name whitespace and concatenate.
 
-    Returns:
-        A single combined DataFrame with a cleaned ``Label`` column.
+    The CICIDS2017 files have leading spaces in most column names
+    (e.g. ``' Label'``); stripping them gives stable names such as ``Label``.
     """
-    raise NotImplementedError("Implemented during the data-loading step.")
+    data_dir = Path(data_dir or DATA_DIR)
+    files = sorted(glob.glob(os.path.join(data_dir, "*.csv")))
+    if not files:
+        raise FileNotFoundError(f"No CSV files found in {data_dir}")
+
+    frames = []
+    for f in files:
+        df = pd.read_csv(f, low_memory=False, encoding="latin-1")
+        df.columns = df.columns.str.strip()
+        frames.append(df)
+        if verbose:
+            print(f"{os.path.basename(f):60s} {df.shape}")
+    data = pd.concat(frames, ignore_index=True)
+    if verbose:
+        print("Combined:", data.shape)
+    return data

@@ -1,196 +1,142 @@
 """FastAPI inference backend for the Explainable NIDS.
 
-Loads the trained stacking model, the saved scaler, and a SHAP TreeExplainer
-(built on the XGBoost base learner) once at startup. Exposes:
+Loads the stacking model, the saved scaler and a SHAP TreeExplainer once at
+startup and exposes:
 
-    GET  /health          liveness + what's loaded
-    POST /predict         classify one raw flow, log the alert to SQLite
-    POST /explain         per-alert SHAP explanation for one raw flow
-    GET  /alerts          recent alerts from the log
-    GET  /stats           class distribution + average latency
+    GET  /health    liveness + what is loaded
+    POST /predict   classify one raw flow and log it to SQLite
+    POST /explain   per-alert SHAP explanation for one raw flow
+    GET  /alerts    most recent logged alerts
+    GET  /stats     class distribution and average latency
 
 Run from the project root:
-    uvicorn api.main:app --reload
+    python -m uvicorn api.main:app
 """
 
 from __future__ import annotations
 
-import json
 import sqlite3
 import sys
 import time
-from datetime import datetime
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
+import joblib
 import numpy as np
 import pandas as pd
-import joblib
-import shap
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-# --- make the project root importable so `src` works when run via uvicorn ---
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+from src.config import DB_PATH, MODEL_FILE, PREPROCESSED_FILE, SCALER_FILE  # noqa: E402
+from src.explainability import build_explainer, explain_one  # noqa: E402
 from src.preprocessing import preprocess_inference  # noqa: E402
 
-MODELS_DIR = ROOT / "models"
-DB_PATH = ROOT / "db" / "nids.db"
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-
-# --------------------------------------------------------------------------- #
-# Artefacts loaded at startup
-# --------------------------------------------------------------------------- #
 STATE: dict = {}
 
 
-def _extract_xgb(model):
-    """Pull the fitted XGBoost base learner out of the stacking ensemble."""
-    return model.named_estimators_["xgb"].named_steps["xgb"]
-
-
 def load_artifacts():
-    model = joblib.load(MODELS_DIR / "stacking_model.joblib")
-    scaler = joblib.load(MODELS_DIR / "scaler.joblib")
-    data = joblib.load(ROOT / "data" / "processed" / "preprocessed.joblib")
-
-    xgb = _extract_xgb(model)
-    try:
-        xgb.set_params(device="cpu")   # SHAP/inference on CPU in the service
-    except Exception:
-        pass
-
-    STATE.update(
-        model=model,
-        scaler=scaler,
-        feature_names=data["feature_names"],
-        class_names=data["label_classes"],
-        explainer=shap.TreeExplainer(xgb),
-    )
+    model = joblib.load(MODEL_FILE)
+    data = joblib.load(PREPROCESSED_FILE)
+    STATE.update(model=model,
+                 scaler=joblib.load(SCALER_FILE),
+                 feature_names=data["feature_names"],
+                 class_names=data["label_classes"],
+                 explainer=build_explainer(model))
 
 
 def init_db():
-    con = sqlite3.connect(DB_PATH)
-    con.execute(
-        """CREATE TABLE IF NOT EXISTS alerts (
-               id            INTEGER PRIMARY KEY AUTOINCREMENT,
-               timestamp     TEXT,
-               predicted     TEXT,
-               confidence    REAL,
-               inference_ms  REAL,
-               true_label    TEXT
-           )"""
-    )
-    con.commit()
-    con.close()
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(DB_PATH) as con:
+        con.execute("""CREATE TABLE IF NOT EXISTS alerts (
+                           id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                           timestamp    TEXT,
+                           predicted    TEXT,
+                           confidence   REAL,
+                           inference_ms REAL,
+                           true_label   TEXT)""")
 
 
-# --------------------------------------------------------------------------- #
-# Request / response models
-# --------------------------------------------------------------------------- #
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    load_artifacts()
+    init_db()
+    yield
+
+
+app = FastAPI(title="Explainable NIDS API", version="1.0.0", lifespan=lifespan)
+
+
 class FlowRequest(BaseModel):
     features: Dict[str, float]
     true_label: Optional[str] = None
 
 
-app = FastAPI(title="Explainable NIDS API", version="1.0.0")
-
-
-@app.on_event("startup")
-def _startup():
-    load_artifacts()
-    init_db()
-
-
-# --------------------------------------------------------------------------- #
-# Helpers
-# --------------------------------------------------------------------------- #
 def _to_X(features: Dict[str, float]) -> np.ndarray:
-    df = pd.DataFrame([features])
-    return preprocess_inference(df, STATE["scaler"], STATE["feature_names"])
+    return preprocess_inference(pd.DataFrame([features]), STATE["scaler"], STATE["feature_names"])
 
 
-# --------------------------------------------------------------------------- #
-# Endpoints
-# --------------------------------------------------------------------------- #
+def _require_model():
+    if "model" not in STATE:
+        raise HTTPException(503, "Model not loaded")
+
+
 @app.get("/health")
 def health():
-    ready = "model" in STATE
-    return {"status": "ok" if ready else "loading",
+    return {"status": "ok" if "model" in STATE else "loading",
             "classes": STATE.get("class_names", []),
             "n_features": len(STATE.get("feature_names", []))}
 
 
 @app.post("/predict")
 def predict(req: FlowRequest):
-    if "model" not in STATE:
-        raise HTTPException(503, "Model not loaded")
+    _require_model()
     X = _to_X(req.features)
-
     t0 = time.perf_counter()
     proba = STATE["model"].predict_proba(X)[0]
     infer_ms = (time.perf_counter() - t0) * 1000.0
-
     idx = int(np.argmax(proba))
-    label = STATE["class_names"][idx]
-    confidence = float(proba[idx])
+    label, conf = STATE["class_names"][idx], float(proba[idx])
 
-    con = sqlite3.connect(DB_PATH)
-    cur = con.execute(
-        "INSERT INTO alerts (timestamp, predicted, confidence, inference_ms, true_label)"
-        " VALUES (?,?,?,?,?)",
-        (datetime.utcnow().isoformat(timespec="seconds"), label,
-         confidence, infer_ms, req.true_label),
-    )
-    con.commit()
-    alert_id = cur.lastrowid
-    con.close()
-
+    with sqlite3.connect(DB_PATH) as con:
+        cur = con.execute(
+            "INSERT INTO alerts (timestamp, predicted, confidence, inference_ms, true_label)"
+            " VALUES (?,?,?,?,?)",
+            (datetime.now(timezone.utc).isoformat(timespec="seconds"), label, conf,
+             infer_ms, req.true_label))
+        alert_id = cur.lastrowid
     return {"alert_id": alert_id, "predicted_label": label,
-            "confidence": round(confidence, 4), "inference_ms": round(infer_ms, 2)}
+            "confidence": round(conf, 4), "inference_ms": round(infer_ms, 2)}
 
 
 @app.post("/explain")
 def explain(req: FlowRequest, top_k: int = 8):
-    if "model" not in STATE:
-        raise HTTPException(503, "Model not loaded")
+    _require_model()
     X = _to_X(req.features)
-
-    idx = int(np.argmax(STATE["model"].predict_proba(X)[0]))   # class the stack chose
-    exp = STATE["explainer"](X)                                # (1, n_feat, n_classes)
-    vals = np.asarray(exp.values)[0, :, idx]
-
-    order = np.argsort(np.abs(vals))[::-1][:top_k]
-    feats = [
-        {"feature": STATE["feature_names"][i],
-         "shap_value": round(float(vals[i]), 4),
-         "direction": "increases" if vals[i] > 0 else "decreases"}
-        for i in order
-    ]
+    idx = int(np.argmax(STATE["model"].predict_proba(X)[0]))
+    feats = explain_one(STATE["explainer"], X, idx, STATE["feature_names"], top_k)
     return {"predicted_label": STATE["class_names"][idx], "top_features": feats}
 
 
 @app.get("/alerts")
 def alerts(limit: int = 50):
-    con = sqlite3.connect(DB_PATH)
-    con.row_factory = sqlite3.Row
-    rows = con.execute(
-        "SELECT * FROM alerts ORDER BY id DESC LIMIT ?", (limit,)
-    ).fetchall()
-    con.close()
+    with sqlite3.connect(DB_PATH) as con:
+        con.row_factory = sqlite3.Row
+        rows = con.execute("SELECT * FROM alerts ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
     return [dict(r) for r in rows]
 
 
 @app.get("/stats")
 def stats():
-    con = sqlite3.connect(DB_PATH)
-    dist = con.execute(
-        "SELECT predicted, COUNT(*) n FROM alerts GROUP BY predicted ORDER BY n DESC"
-    ).fetchall()
-    avg = con.execute("SELECT AVG(inference_ms) FROM alerts").fetchone()[0]
-    total = con.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
-    con.close()
+    with sqlite3.connect(DB_PATH) as con:
+        dist = con.execute("SELECT predicted, COUNT(*) FROM alerts GROUP BY predicted"
+                           " ORDER BY COUNT(*) DESC").fetchall()
+        avg = con.execute("SELECT AVG(inference_ms) FROM alerts").fetchone()[0]
+        total = con.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
     return {"total_alerts": total,
             "avg_inference_ms": round(avg, 2) if avg else None,
             "distribution": {p: n for p, n in dist}}
