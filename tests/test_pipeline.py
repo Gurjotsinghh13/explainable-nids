@@ -80,6 +80,7 @@ def test_end_to_end():
         flow = {"features": {k: float(v) for k, v in raw.iloc[0].items()}, "true_label": "BENIGN"}
         r = client.post("/predict", json=flow).json()
         assert r["predicted_label"] in d["label_classes"]
+        assert "top_classes" in r and len(r["top_classes"]) <= 3
         assert len(client.post("/explain", json=flow).json()["top_features"]) > 0
         assert client.get("/stats").json()["total_alerts"] == 1
         assert len(client.get("/alerts").json()) == 1

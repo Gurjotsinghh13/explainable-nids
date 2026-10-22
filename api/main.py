@@ -102,6 +102,10 @@ def predict(req: FlowRequest):
     idx = int(np.argmax(proba))
     label, conf = STATE["class_names"][idx], float(proba[idx])
 
+    top3_idx = np.argsort(proba)[::-1][:3]
+    top_classes = [{"class": STATE["class_names"][i], "probability": round(float(proba[i]), 4)}
+                   for i in top3_idx]
+
     with sqlite3.connect(DB_PATH) as con:
         cur = con.execute(
             "INSERT INTO alerts (timestamp, predicted, confidence, inference_ms, true_label)"
@@ -110,7 +114,8 @@ def predict(req: FlowRequest):
              infer_ms, req.true_label))
         alert_id = cur.lastrowid
     return {"alert_id": alert_id, "predicted_label": label,
-            "confidence": round(conf, 4), "inference_ms": round(infer_ms, 2)}
+            "confidence": round(conf, 4), "inference_ms": round(infer_ms, 2),
+            "top_classes": top_classes}
 
 
 @app.post("/explain")
