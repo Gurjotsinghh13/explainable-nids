@@ -40,34 +40,34 @@ STACKING_PER_CLASS_CSV = REPORTS_DIR / "stacking_per_class.csv"
 
 API_URL = os.environ.get("NIDS_API", "http://127.0.0.1:8000")
 
-# Fixed class colors across all pages
+# Restrained, professional cybersecurity color palette
 CLASS_COLORS = {
-    "BENIGN": "#2ecc71",
-    "Bot": "#e74c3c",
-    "DDoS": "#e67e22",
-    "DoS GoldenEye": "#d35400",
-    "DoS Hulk": "#c0392b",
-    "DoS Slowhttptest": "#f39c12",
-    "DoS slowloris": "#e67e22",
-    "FTP-Patator": "#9b59b6",
-    "PortScan": "#3498db",
-    "SSH-Patator": "#8e44ad",
-    "Web Attack": "#1abc9c",
+    "BENIGN": "#10b981",          # Emerald green (normal traffic)
+    "Bot": "#dc2626",             # Red (critical automation)
+    "DDoS": "#ea580c",            # Orange (volumetric flood)
+    "DoS GoldenEye": "#c2410c",   # Deep orange
+    "DoS Hulk": "#b91c1c",        # Crimson
+    "DoS Slowhttptest": "#d97706",# Amber
+    "DoS slowloris": "#e11d48",   # Rose
+    "FTP-Patator": "#7c3aed",     # Violet
+    "PortScan": "#2563eb",        # Slate blue
+    "SSH-Patator": "#9333ea",     # Purple
+    "Web Attack": "#0d9488",      # Teal
 }
 
 # Threat severity mapping
 SEVERITY_MAP = {
-    "DDoS": "🔴 High",
-    "DoS Hulk": "🔴 High",
-    "DoS GoldenEye": "🔴 High",
-    "DoS slowloris": "🔴 High",
-    "DoS Slowhttptest": "🔴 High",
-    "Bot": "🔴 High",
-    "Web Attack": "🔴 High",
-    "FTP-Patator": "🟡 Medium",
-    "SSH-Patator": "🟡 Medium",
-    "PortScan": "🔵 Low",
-    "BENIGN": "⚪ None",
+    "DDoS": "High",
+    "DoS Hulk": "High",
+    "DoS GoldenEye": "High",
+    "DoS slowloris": "High",
+    "DoS Slowhttptest": "High",
+    "Bot": "High",
+    "Web Attack": "High",
+    "FTP-Patator": "Medium",
+    "SSH-Patator": "Medium",
+    "PortScan": "Low",
+    "BENIGN": "None",
 }
 
 # Complete, precise 64-feature domain description dictionary
@@ -156,6 +156,132 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# --------------------------------------------------------------------------- #
+# Professional Light Enterprise CSS
+# --------------------------------------------------------------------------- #
+st.markdown(
+    """
+    <style>
+    /* Clean font stack & layout constraints */
+    html, body, [class*="css"] {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 1380px;
+    }
+    
+    /* Enterprise header */
+    .soc-header {
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .soc-header h1 {
+        font-size: 1.4rem !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        letter-spacing: -0.02em;
+        margin: 0 0 0.2rem 0 !important;
+        line-height: 1.25 !important;
+    }
+    .soc-header p {
+        font-size: 0.85rem !important;
+        color: #64748b !important;
+        margin: 0 !important;
+    }
+    
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #f8fafc;
+        border-right: 1px solid #e2e8f0;
+    }
+    [data-testid="stSidebar"] h2 {
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        margin-top: 0.5rem !important;
+    }
+    [data-testid="stSidebar"] h3 {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+    }
+    
+    /* Metric Cards */
+    [data-testid="stMetric"] {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px !important;
+        padding: 10px 14px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #64748b !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #0f172a !important;
+        font-size: 1.35rem !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em !important;
+    }
+    
+    /* Buttons */
+    button[kind="primary"] {
+        background-color: #1e40af !important;
+        border-color: #1e40af !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 5px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    button[kind="secondary"] {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #334155 !important;
+        font-weight: 500 !important;
+        border-radius: 5px !important;
+    }
+    button[kind="secondary"]:hover {
+        background-color: #f8fafc !important;
+        border-color: #94a3b8 !important;
+        color: #0f172a !important;
+    }
+    
+    /* Alerts & Notifications */
+    [data-testid="stAlert"] {
+        border-radius: 6px !important;
+        border: 1px solid #e2e8f0 !important;
+        font-size: 0.875rem !important;
+    }
+    
+    /* Tables & Dataframes */
+    [data-testid="stDataFrame"] {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px !important;
+        overflow: hidden !important;
+    }
+    
+    /* Headings */
+    h2, h3, h4 {
+        color: #0f172a !important;
+        font-weight: 600 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 # --------------------------------------------------------------------------- #
 # Helpers & API Client
@@ -193,6 +319,40 @@ def format_raw_val(val: float | int) -> str:
         return str(val)
 
 
+def apply_plot_theme(fig, height: int | None = None):
+    """Enforces a clean light-mode enterprise aesthetic on Plotly charts."""
+    fig.update_layout(
+        template="plotly_white",
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
+        font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", size=12, color="#334155"),
+        title_font=dict(size=13, color="#0f172a", family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"),
+        legend=dict(
+            font=dict(size=11, color="#475569"),
+            bgcolor="rgba(255, 255, 255, 0.9)",
+            bordercolor="#e2e8f0",
+            borderwidth=1,
+        ),
+        xaxis=dict(
+            gridcolor="#f1f5f9",
+            linecolor="#cbd5e1",
+            zerolinecolor="#e2e8f0",
+            tickfont=dict(size=11, color="#64748b"),
+            title_font=dict(size=12, color="#334155"),
+        ),
+        yaxis=dict(
+            gridcolor="#f1f5f9",
+            linecolor="#cbd5e1",
+            zerolinecolor="#e2e8f0",
+            tickfont=dict(size=11, color="#64748b"),
+            title_font=dict(size=12, color="#334155"),
+        ),
+    )
+    if height:
+        fig.update_layout(height=height)
+    return fig
+
+
 # --------------------------------------------------------------------------- #
 # Session State Initialization
 # --------------------------------------------------------------------------- #
@@ -205,13 +365,22 @@ ss.setdefault("current_explanation", None)
 ss.setdefault("total_rtt_ms", 0.0)
 ss.setdefault("rtt_count", 0)
 ss.setdefault("batch_results", None)
+ss.setdefault("class_counts", {cls: 0 for cls in CLASS_COLORS.keys()})
+
+# Synchronize class_counts with alert_ids if alerts exist in session
+if sum(ss.class_counts.values()) != len(ss.alert_ids):
+    ss.class_counts = {cls: 0 for cls in CLASS_COLORS.keys()}
+    for aid in ss.alert_ids:
+        lbl = ss.alerts.get(aid, {}).get("predicted")
+        if lbl in ss.class_counts:
+            ss.class_counts[lbl] += 1
 
 replay = load_replay_data()
 feature_cols = [c for c in replay.columns if c != "Label"] if not replay.empty else []
 
 
 # --------------------------------------------------------------------------- #
-# Sidebar Navigation & Status
+# Sidebar Navigation & System Status
 # --------------------------------------------------------------------------- #
 st.sidebar.markdown("## 🛡️ NIDS Framework")
 
@@ -219,14 +388,18 @@ health = api_get("/health")
 api_online = health is not None and health.get("status") == "ok"
 if api_online:
     st.sidebar.markdown(
-        '<span style="color:#2ecc71;font-weight:600;">● API Online</span> '
-        f"<small>({health.get('n_features', 64)} feats · {len(health.get('classes', []))} classes)</small>",
+        '<div style="font-size:12px; font-weight:600; color:#16a34a; margin-bottom:8px;">'
+        '● System Online '
+        f'<span style="color:#64748b; font-weight:400;">({health.get("n_features", 64)} feats · {len(health.get("classes", []))} classes)</span>'
+        '</div>',
         unsafe_allow_html=True,
     )
 else:
     st.sidebar.markdown(
-        '<span style="color:#e74c3c;font-weight:600;">● API Offline</span> '
-        "<small>(Start with <code>python -m uvicorn api.main:app</code>)</small>",
+        '<div style="font-size:12px; font-weight:600; color:#dc2626; margin-bottom:8px;">'
+        '● System Offline '
+        '<span style="color:#64748b; font-weight:400;">(Start backend on :8000)</span>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -245,8 +418,15 @@ st.sidebar.markdown("---")
 # PAGE 1: LIVE MONITOR
 # =========================================================================== #
 if page == "📡 Live Monitor":
-    st.title("Explainable AI-Based Network Intrusion Detection (NIDS)")
-    st.caption("Stacking (RF + XGBoost → LR) · within-fold SMOTE · SHAP · CICIDS2017")
+    st.markdown(
+        """
+        <div class="soc-header">
+            <h1>Network Intrusion Detection System</h1>
+            <p>Real-time flow telemetry, anomaly classification & ML decision provenance · CICIDS2017</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # Replay controls in sidebar
     st.sidebar.markdown("### Replay Controls")
@@ -265,6 +445,7 @@ if page == "📡 Live Monitor":
         ss.current_explanation = None
         ss.total_rtt_ms = 0.0
         ss.rtt_count = 0
+        ss.class_counts = {cls: 0 for cls in CLASS_COLORS.keys()}
         st.rerun()
 
     progress_val = min(max(ss.cursor / len(replay), 0.0), 1.0) if len(replay) else 0.0
@@ -299,26 +480,27 @@ if page == "📡 Live Monitor":
             r, rtt_ms = api_post("/predict", payload)
             if "error" not in r and "alert_id" in r:
                 aid = r["alert_id"]
+                pred_label = r["predicted_label"]
                 ss.alerts[aid] = {
                     "id": aid,
                     "time": datetime.now().strftime("%H:%M:%S"),
-                    "predicted": r["predicted_label"],
+                    "predicted": pred_label,
                     "true": str(row["Label"]),
                     "confidence": float(r["confidence"]),
                     "latency_ms": float(r["inference_ms"]),
                     "round_trip_ms": rtt_ms,
-                    "severity": SEVERITY_MAP.get(r["predicted_label"], "⚪ None"),
+                    "severity": SEVERITY_MAP.get(pred_label, "None"),
                     "top_classes": r.get("top_classes", []),
                     "features": payload["features"],
                 }
                 if aid not in ss.alert_ids:
                     ss.alert_ids.insert(0, aid)
+                ss.class_counts[pred_label] = ss.class_counts.get(pred_label, 0) + 1
                 ss.total_rtt_ms += rtt_ms
                 ss.rtt_count += 1
             ss.cursor += 1
 
     # KPI Metrics Row
-    stats = api_get("/stats") or {}
     n_proc = len(ss.alert_ids)
     n_attacks = sum(1 for aid in ss.alert_ids if ss.alerts[aid]["predicted"] != "BENIGN")
     acc = (sum(1 for aid in ss.alert_ids if ss.alerts[aid]["true"] == ss.alerts[aid]["predicted"]) / n_proc) if n_proc else 0.0
@@ -326,15 +508,14 @@ if page == "📡 Live Monitor":
     avg_rtt = (ss.total_rtt_ms / ss.rtt_count) if ss.rtt_count else 0.0
 
     m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("Flows processed", f"{n_proc:,}")
-    m2.metric("Attacks flagged", f"{n_attacks:,}")
-    m3.metric("Live accuracy", f"{acc * 100:.1f}%")
-    m4.metric("Avg inference", f"{avg_infer:.1f} ms")
-    m5.metric("Avg round trip", f"{avg_rtt:.1f} ms")
+    m1.metric("Flows Processed", f"{n_proc:,}")
+    m2.metric("Attacks Flagged", f"{n_attacks:,}")
+    m3.metric("Live Accuracy", f"{acc * 100:.1f}%")
+    m4.metric("Avg Inference", f"{avg_infer:.1f} ms")
+    m5.metric("Avg Round Trip", f"{avg_rtt:.1f} ms")
 
     # Cumulative line chart under KPIs
     if ss.alert_ids:
-        # Build chronological history
         ordered_alerts = [ss.alerts[aid] for aid in reversed(ss.alert_ids)]
         timeline_df = pd.DataFrame(ordered_alerts)
         timeline_df["flow_idx"] = np.arange(1, len(timeline_df) + 1)
@@ -345,10 +526,11 @@ if page == "📡 Live Monitor":
             timeline_df,
             x="flow_idx",
             y="cumulative_attacks",
-            title="Cumulative Detected Attacks Over Time",
-            color_discrete_sequence=["#eb6834"],
-            height=220,
+            title="Cumulative Detected Threats Over Flow Stream",
+            color_discrete_sequence=["#dc2626"],
+            height=200,
         )
+        apply_plot_theme(fig_line, height=200)
         fig_line.update_layout(
             margin=dict(l=10, r=10, t=30, b=10),
             xaxis_title="Flow Sequence",
@@ -361,7 +543,7 @@ if page == "📡 Live Monitor":
     left, right = st.columns([3, 2])
 
     with left:
-        st.subheader("Live classification feed")
+        st.subheader("Live Classification Feed")
         st.caption("Demo replay: balanced sample of 1,650 real CICIDS2017 test flows (150 per class). Real traffic is about 80% benign.")
 
         # Filter controls
@@ -398,11 +580,11 @@ if page == "📡 Live Monitor":
 
                 def style_feed_row(row):
                     if row["_misclassified"]:
-                        return ["background-color: rgba(243, 156, 18, 0.35); font-weight: 500;"] * len(row)
+                        return ["background-color: #fffbeb; color: #92400e; font-weight: 500;"] * len(row)
                     elif row["_attack"]:
-                        return ["background-color: rgba(235, 104, 52, 0.22);"] * len(row)
+                        return ["background-color: #fef2f2; color: #991b1b; font-weight: 500;"] * len(row)
                     else:
-                        return [""] * len(row)
+                        return ["background-color: #ffffff; color: #1e293b;"] * len(row)
 
                 display_cols = ["Alert ID", "Time", "Severity", "Predicted", "True Label", "Confidence", "Latency ms", "Status"]
                 styled_table = feed_df.style.apply(style_feed_row, axis=1)
@@ -410,16 +592,24 @@ if page == "📡 Live Monitor":
             else:
                 st.info("No alerts match the selected filters.")
 
-            st.caption("⚪ **Neutral**: Correct Benign &nbsp;|&nbsp; 🔴 **Light Red**: Correct Attack &nbsp;|&nbsp; 🟡 **Amber**: Misclassified Alert")
+            st.markdown(
+                """
+                <div style="display:flex; flex-wrap:wrap; gap:16px; font-size:12px; color:#64748b; margin-top:8px;">
+                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ffffff;border:1px solid #cbd5e1;margin-right:6px;vertical-align:middle;"></span><strong>Neutral:</strong> Correct Benign</span>
+                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fef2f2;border:1px solid #fecaca;margin-right:6px;vertical-align:middle;"></span><strong style="color:#991b1b;">Light Red:</strong> Correct Attack</span>
+                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fffbeb;border:1px solid #fde68a;margin-right:6px;vertical-align:middle;"></span><strong style="color:#92400e;">Amber:</strong> Misclassified Flow</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
         else:
-            st.info("Press ▶ Start to begin replaying flows.")
+            st.info("Press ▶ Start in the sidebar to begin streaming flows.")
 
     with right:
-        st.subheader("Attack-type distribution")
-        dist = stats.get("distribution", {})
-        if dist:
-            dd = pd.DataFrame({"class": list(dist.keys()), "count": list(dist.values())})
-            # Horizontal bars sorted descending so labels don't rotate
+        st.subheader("Attack-Type Distribution")
+        session_dist = {cls: count for cls, count in ss.class_counts.items() if count > 0}
+        if session_dist:
+            dd = pd.DataFrame({"class": list(session_dist.keys()), "count": list(session_dist.values())})
             dd = dd.sort_values("count", ascending=True)
             fig_dist = px.bar(
                 dd,
@@ -428,17 +618,19 @@ if page == "📡 Live Monitor":
                 orientation="h",
                 color="class",
                 color_discrete_map=CLASS_COLORS,
-                height=460,
+                height=450,
             )
+            apply_plot_theme(fig_dist, height=450)
             fig_dist.update_layout(
                 margin=dict(l=10, r=10, t=10, b=10),
                 xaxis_title="Alert Count",
                 yaxis_title="",
                 showlegend=False,
             )
+            fig_dist.update_xaxes(tickformat="d")
             st.plotly_chart(fig_dist, use_container_width=True, config={"displayModeBar": False})
         else:
-            st.info("No alerts logged in the database yet.")
+            st.info("No alerts logged in the current session yet. Press ▶ Start in the sidebar to stream flows.")
 
     # Auto-play loop
     if ss.running:
@@ -451,8 +643,15 @@ if page == "📡 Live Monitor":
 # PAGE 2: INVESTIGATE ALERT
 # =========================================================================== #
 elif page == "🔍 Investigate Alert":
-    st.title("🔍 Investigate Alert & SHAP Explainability")
-    st.caption("Inspect individual network flows with local SHAP feature attribution on the XGBoost base learner")
+    st.markdown(
+        """
+        <div class="soc-header">
+            <h1>Investigate Alert & SHAP Explainability</h1>
+            <p>Feature attribution and ML decision provenance via SHAP TreeExplainer on the XGBoost base learner</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if not api_online:
         st.warning("⚠️ API is offline. Start the backend with `python -m uvicorn api.main:app` to generate explanations.")
@@ -473,7 +672,7 @@ elif page == "🔍 Investigate Alert":
             key="selected_alert_id_investigate",
         )
 
-        if btn_col.button("Explain selected alert", use_container_width=True):
+        if btn_col.button("Explain Selected Alert", use_container_width=True, type="primary"):
             ss.running = False  # automatically pause replay while examining
             chosen = ss.alerts[selected_alert_id]
             ex_res, _ = api_post("/explain", {"features": chosen["features"]})
@@ -498,16 +697,40 @@ elif page == "🔍 Investigate Alert":
                     "The explanation may not correspond to this flow."
                 )
 
-            # Verdict line
             is_corr = alert_info["predicted"] == alert_info["true"]
-            mark_symbol = "✓" if is_corr else "✗"
+            mark_symbol = "✓ Correct" if is_corr else "✗ Misclassified"
             conf_pct = alert_info["confidence"] * 100
+            is_attack = alert_info["predicted"] != "BENIGN"
 
-            st.markdown("---")
-            st.markdown(
-                f"### Verdict: Flagged as **{alert_info['predicted']}** ({conf_pct:.1f}% confidence). "
-                f"True label: **{alert_info['true']}**. &nbsp;`{mark_symbol}`"
-            )
+            status_bg = "#fef2f2" if is_attack else "#f0fdf4"
+            status_text_color = "#991b1b" if is_attack else "#166534"
+            status_border = "#fecaca" if is_attack else "#bbf7d0"
+            pred_color = CLASS_COLORS.get(alert_info["predicted"], "#0f172a")
+
+            verdict_card_html = f"""
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:16px 20px; margin: 12px 0 16px 0; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <div style="font-size:11px; text-transform:uppercase; font-weight:600; letter-spacing:0.05em; color:#64748b;">Alert Classification Verdict</div>
+                        <div style="font-size:1.25rem; font-weight:700; color:#0f172a; margin-top:4px;">
+                            Flagged as <span style="color:{pred_color};">{alert_info['predicted']}</span>
+                            <span style="font-size:0.95rem; font-weight:500; color:#475569;">({conf_pct:.1f}% confidence)</span>
+                        </div>
+                        <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                            Ground Truth: <strong style="color:#1e293b;">{alert_info['true']}</strong> &nbsp;·&nbsp; 
+                            Threat Severity: <strong style="color:#1e293b;">{alert_info['severity']}</strong>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:600; background:{status_bg}; color:{status_text_color}; border:1px solid {status_border};">
+                            {mark_symbol}
+                        </span>
+                        <div style="font-size:11px; color:#64748b; margin-top:6px;">Inference Latency: {alert_info['latency_ms']:.1f} ms</div>
+                    </div>
+                </div>
+            </div>
+            """
+            st.markdown(verdict_card_html, unsafe_allow_html=True)
 
             # Top-3 class probabilities
             top_classes = alert_info.get("top_classes", [])
@@ -520,7 +743,7 @@ elif page == "🔍 Investigate Alert":
                         prob_val = min(max(float(tc["probability"]), 0.0), 1.0)
                         st.progress(prob_val, text=f"{prob_val * 100:.1f}%")
 
-            # Analyst Summary Box (Template-based, no LLM)
+            # Analyst Summary Box (Template-based, deterministic)
             top_items = ex_data.get("top_features", [])
             pos_reasons = []
             neg_reasons = []
@@ -553,11 +776,17 @@ elif page == "🔍 Investigate Alert":
             neg_text = f", while {neg_reasons[0]} slightly opposed this classification" if neg_reasons else ""
 
             summary_text = (
-                f"**Analyst Summary:** This network flow was classified as **{pred_lbl}** ({conf_pct:.1f}% confidence). "
-                f"The decision {pos_text}{neg_text}. "
-                f"This pattern strongly aligns with {ctx} documented in the CICIDS2017 benchmark dataset."
+                f"This network flow was classified as <strong>{pred_lbl}</strong> ({conf_pct:.1f}% confidence). "
+                f"The model's decision {pos_text}{neg_text}. "
+                f"This pattern aligns with {ctx} documented in the CICIDS2017 benchmark dataset."
             )
-            st.info(summary_text)
+            analyst_html = f"""
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #2563eb; border-radius:4px; padding:12px 16px; margin:14px 0;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#1e40af; margin-bottom:4px;">Analyst Decision Summary</div>
+                <div style="font-size:13px; color:#1e293b; line-height:1.5;">{summary_text}</div>
+            </div>
+            """
+            st.markdown(analyst_html, unsafe_allow_html=True)
 
             # Chart: Horizontal bar chart with top 8 features sorted by |SHAP|
             top8 = top_items[:8][::-1]
@@ -577,8 +806,8 @@ elif page == "🔍 Investigate Alert":
                 text_labels.append(f"{sv:+.2f}")
 
             color_map = {
-                f"Pushes toward {pred_lbl}": "#eb6834",
-                "Pushes against": "#2a78d6",
+                f"Pushes toward {pred_lbl}": "#dc2626",
+                "Pushes against": "#2563eb",
             }
 
             fig_shap = px.bar(
@@ -588,11 +817,12 @@ elif page == "🔍 Investigate Alert":
                 color=color_categories,
                 color_discrete_map=color_map,
                 text=text_labels,
-                height=420,
+                height=400,
             )
+            apply_plot_theme(fig_shap, height=400)
             fig_shap.update_layout(
                 margin=dict(l=10, r=20, t=20, b=10),
-                xaxis_title="Contribution to the predicted class (SHAP value)",
+                xaxis_title="Contribution to predicted class (SHAP value)",
                 yaxis_title="",
                 legend_title_text="",
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
@@ -600,12 +830,20 @@ elif page == "🔍 Investigate Alert":
             fig_shap.update_traces(textposition="outside")
             st.plotly_chart(fig_shap, use_container_width=True, config={"displayModeBar": False})
 
-            # Feature descriptions for top 4 features
-            st.markdown("#### Feature Descriptions")
+            # Feature descriptions table
+            st.markdown("#### Top Influential Feature Descriptions")
+            desc_rows = []
             for item in top_items[:5]:
                 fname = item["feature"]
+                raw_v = alert_info["features"].get(fname, 0.0)
                 desc = FEATURE_DESCRIPTIONS.get(fname, "Network flow measurement from the CICIDS2017 dataset.")
-                st.markdown(f"- **{fname}**: {desc}")
+                desc_rows.append({
+                    "Feature": fname,
+                    "Observed Value": format_raw_val(raw_v),
+                    "SHAP Impact": f"{float(item['shap_value']):+.4f}",
+                    "Domain Interpretation": desc,
+                })
+            st.dataframe(pd.DataFrame(desc_rows), hide_index=True, use_container_width=True)
 
             st.caption("Explanation computed with SHAP TreeExplainer on the XGBoost base learner of the stacking model.")
 
@@ -635,8 +873,15 @@ elif page == "🔍 Investigate Alert":
 # PAGE 3: BATCH ANALYSIS
 # =========================================================================== #
 elif page == "📁 Batch Analysis":
-    st.title("📁 Batch Traffic Analysis")
-    st.caption("Upload or load offline flow datasets for batch intrusion classification (Max 2,000 flows)")
+    st.markdown(
+        """
+        <div class="soc-header">
+            <h1>Batch Flow Analysis</h1>
+            <p>Bulk traffic auditing, offline log analysis and performance verification (Max 2,000 flows)</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if not api_online:
         st.warning("⚠️ API is offline. Start the backend with `python -m uvicorn api.main:app` before running batch analysis.")
@@ -659,7 +904,7 @@ elif page == "📁 Batch Analysis":
 
     if batch_df is not None:
         if len(batch_df) > 2000:
-            st.warning("Batch truncated to first 2,000 rows for real-time demonstration stability.")
+            st.warning("Batch truncated to first 2,000 rows for demonstration stability.")
             batch_df = batch_df.iloc[:2000]
 
         has_label = "Label" in batch_df.columns
@@ -728,8 +973,9 @@ elif page == "📁 Batch Analysis":
             y="count",
             color="class",
             color_discrete_map=CLASS_COLORS,
-            height=340,
+            height=320,
         )
+        apply_plot_theme(fig_batch, height=320)
         fig_batch.update_layout(margin=dict(l=10, r=10, t=10, b=10), showlegend=False)
         st.plotly_chart(fig_batch, use_container_width=True, config={"displayModeBar": False})
 
@@ -760,11 +1006,18 @@ elif page == "📁 Batch Analysis":
 # PAGE 4: MODEL PERFORMANCE
 # =========================================================================== #
 elif page == "📊 Model Performance":
-    st.title("📊 Model Performance & Benchmark Evaluation")
-    st.caption("Empirical evidence from the CICIDS2017 held-out test set (565,566 flows) and 5-fold cross-validation")
+    st.markdown(
+        """
+        <div class="soc-header">
+            <h1>Model Performance & Evaluation</h1>
+            <p>Empirical evidence from the CICIDS2017 held-out test set (565,566 flows) and 5-fold cross-validation</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # Key Results Card
-    st.markdown("### 🏆 Key Verified Results")
+    st.markdown("### Key Verified Results")
     kr1, kr2, kr3, kr4 = st.columns(4)
     kr1.metric("Overall Accuracy", "99.9%")
     kr2.metric("Macro-F1 Score", "0.976")
@@ -787,7 +1040,7 @@ elif page == "📊 Model Performance":
 
         # Grouped bar chart comparing models
         fig_comp = go.Figure()
-        metrics_to_plot = [c for c in comp_df.columns if c != "model"]
+        metric_palette = {"accuracy": "#2563eb", "macro_F1": "#0d9488", "Bot_recall": "#d97706"}
         for m in ["accuracy", "macro_F1", "Bot_recall"]:
             if m in comp_df.columns:
                 fig_comp.add_trace(go.Bar(
@@ -796,10 +1049,12 @@ elif page == "📊 Model Performance":
                     y=comp_df[m],
                     text=[f"{v:.4f}" for v in comp_df[m]],
                     textposition="auto",
+                    marker_color=metric_palette.get(m, "#2563eb"),
                 ))
+        apply_plot_theme(fig_comp, height=360)
         fig_comp.update_layout(
             barmode="group",
-            height=380,
+            height=360,
             margin=dict(l=10, r=10, t=30, b=10),
             yaxis=dict(range=[0.4, 1.05]),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
@@ -820,9 +1075,8 @@ elif page == "📊 Model Performance":
         st.caption("Evaluation on held-out 20% test set (565,566 real flows). Minority classes highlighted for recovery analysis.")
 
         def highlight_weak(row):
-            # Highlight classes with low support or bot recall
             if row["Class"] in ["Bot", "Web Attack"]:
-                return ["background-color: rgba(235, 104, 52, 0.25)"] * len(row)
+                return ["background-color: #fef2f2; color: #991b1b; font-weight: 500;"] * len(row)
             return [""] * len(row)
 
         st.dataframe(per_class_df.style.apply(highlight_weak, axis=1), hide_index=True, use_container_width=True)
@@ -848,27 +1102,43 @@ elif page == "📊 Model Performance":
 # PAGE 5: ABOUT
 # =========================================================================== #
 elif page == "ℹ️ About":
-    st.title("ℹ️ About the Project")
-    st.subheader("Explainable AI-Based Network Intrusion Detection Framework Using Ensemble Machine Learning for Near Real-Time Threat Detection")
-    st.caption("B.Tech Capstone Project (2026-27) · MPSTME Shirpur, SVKM's NMIMS")
+    st.markdown(
+        """
+        <div class="soc-header">
+            <h1>About the Project</h1>
+            <p>Explainable AI-Based Network Intrusion Detection Framework Using Ensemble Machine Learning for Near Real-Time Threat Detection</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     col_team, col_guide = st.columns(2)
     with col_team:
-        st.markdown("### 👥 Student Team")
         st.markdown(
             """
-            - **Gurjot Singh** (Roll No. B205)
-            - **Lehar Nimodiya** (Roll No. B233)
-            - **Lokesh Ingale** (Roll No. B250)
-            """
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                <div style="font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">Project Authors</div>
+                <div style="font-size:14px; color:#1e293b; line-height:1.7;">
+                    • <strong>Gurjot Singh</strong> (Roll No. B205)<br>
+                    • <strong>Lehar Nimodiya</strong> (Roll No. B233)<br>
+                    • <strong>Lokesh Ingale</strong> (Roll No. B250)
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
     with col_guide:
-        st.markdown("### 🎓 Project Guide")
         st.markdown(
             """
-            - **Dr. Naziya Hussain**  
-              *Department of Computer Engineering, MPSTME Shirpur*
-            """
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                <div style="font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">Faculty Supervision</div>
+                <div style="font-size:14px; color:#1e293b; line-height:1.7;">
+                    • <strong>Dr. Naziya Hussain</strong><br>
+                    <span style="color:#64748b; font-size:13px;">Department of Computer Engineering, MPSTME Shirpur<br>SVKM's Narsee Monjee Institute of Management Studies (NMIMS)</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     st.markdown("---")
@@ -909,23 +1179,33 @@ elif page == "ℹ️ About":
 
     col_facts, col_limits = st.columns(2)
     with col_facts:
-        st.markdown("### 📋 Dataset Facts (CICIDS2017)")
         st.markdown(
             """
-            - **Source:** Canadian Institute for Cybersecurity (CICIDS2017 MachineLearningCVE)
-            - **Total Valid Flows:** 2,827,829 flows (Heartbleed & Infiltration excluded due to <40 instances)
-            - **Features:** 64 scaled continuous & discrete flow features
-            - **Classes (11):** BENIGN, Bot, DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest, DoS slowloris, FTP-Patator, PortScan, SSH-Patator, Web Attack
-            - **Split:** Stratified 80% train (2,262,263) / 20% test (565,566)
-            """
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                <div style="font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">Dataset Benchmark Facts</div>
+                <div style="font-size:13px; color:#1e293b; line-height:1.6;">
+                    • <strong>Source:</strong> Canadian Institute for Cybersecurity (CICIDS2017 MachineLearningCVE)<br>
+                    • <strong>Total Valid Flows:</strong> 2,827,829 flows (Heartbleed & Infiltration excluded due to &lt;40 instances)<br>
+                    • <strong>Features:</strong> 64 scaled continuous & discrete flow features<br>
+                    • <strong>Classes (11):</strong> BENIGN, Bot, DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest, DoS slowloris, FTP-Patator, PortScan, SSH-Patator, Web Attack<br>
+                    • <strong>Split:</strong> Stratified 80% train (2,262,263) / 20% test (565,566)
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     with col_limits:
-        st.markdown("### ⚠️ Recognized Limitations")
         st.markdown(
             """
-            1. **Benchmark Evaluation:** The model is trained and validated on the CICIDS2017 dataset; cross-dataset evaluation (e.g. on CSE-CIC-IDS2018 or UNSW-NB15) is planned for future research.
-            2. **Replay vs. Kernel Sniffing:** The demonstration operates via serialized replay of real captured test flows rather than real-time kernel packet capture (e.g. Scapy or PF_RING).
-            3. **Base Learner Explanation:** TreeExplainer computes exact Shapley values on the XGBoost base learner rather than the Logistic Regression meta-learner directly.
-            """
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                <div style="font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">Recognized Scope & Limitations</div>
+                <div style="font-size:13px; color:#1e293b; line-height:1.6;">
+                    1. <strong>Benchmark Evaluation:</strong> Trained and validated on CICIDS2017; cross-dataset evaluation (e.g. on CSE-CIC-IDS2018 or UNSW-NB15) is planned for future work.<br>
+                    2. <strong>Replay vs. Kernel Sniffing:</strong> Operates via serialized replay of real captured test flows rather than real-time kernel packet capture.<br>
+                    3. <strong>Base Learner Explanation:</strong> TreeExplainer computes exact Shapley values on the XGBoost base learner rather than the Logistic Regression meta-learner directly.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
